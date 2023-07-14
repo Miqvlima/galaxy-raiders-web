@@ -1,6 +1,30 @@
 <template>
   <div id="canvas">
     <div id="deep-space" />
+    <div id="leaderboard" v-show="leaderboardOn">
+      <p>First Place</p>
+      <ul>
+        <li>Score: {{ scoreTable[0].score }}</li>
+        <li>Asteroids Destroyed: {{ scoreTable[0].numberAsteroidsDestroyed }}</li>
+      </ul>
+      <p>Second Place</p>
+      <ul>
+        <li>Score: {{ scoreTable[1].score }}</li>
+        <li>Asteroids Destroyed: {{ scoreTable[1].numberAsteroidsDestroyed }}</li>
+      </ul>
+      <p>Third Place</p>
+      <ul>
+        <li>Score: {{ scoreTable[2].score }}</li>
+        <li>Asteroids Destroyed: {{ scoreTable[2].numberAsteroidsDestroyed }}</li>
+      </ul>
+    </div>
+
+    <div id="menu" v-show="openMenu">
+      <button v-on:click="startGame">Start</button>
+      <button v-on:click="showLeaderboard">Leaderboard</button>
+      <button v-on:click="quitGame">Quit</button>
+    </div>
+      
     <div id="space-field">
       <SpaceObject id="spaceship" class="spaceship" :data="spaceField.ship" resolution="2" />
 
@@ -19,7 +43,38 @@
   </div>
 </template>
 
+
 <script setup>
+
+import Leaderboard from "../assets/Leaderboard.json"
+
+let leaderboardOn = false;
+let openMenu = true;
+let playingGame = false;
+
+export default {
+  data: () => ({
+    scoreTable: Leaderboard
+  })
+}
+
+const startGame = () => {
+  playingGame = true;
+  openMenu = false;
+  leaderboardOn = false;
+}
+
+const showLeaderboard = () => {
+  leaderboardOn = true;
+}
+
+const quitGame = () => {
+  playingGame = false;
+  openMenu = false;
+  leaderboardOn = false;
+  $post("/quit")
+}
+
 const {
   data: spaceField,
   refresh: updateSpaceField
@@ -50,6 +105,24 @@ onMounted(() => {
 </script>
 
 <style>
+
+#leaderboard {
+  height: 80px;
+  width: 45px;
+  flex-direction: column;
+  align-items: center;
+  left: 30px;
+  position: absolute;
+}
+
+#menu {
+  height: 100px;
+  width: 60px;
+  flex-direction: column;
+  align-items: center;
+  position: absolute;
+}
+
 #canvas {
   height: calc(100vh - 4rem);
   width: calc(100vw - 4rem);
